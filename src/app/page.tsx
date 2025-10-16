@@ -181,19 +181,30 @@ export default function HomePage() {
               return (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-200"
+                  className={`rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-blue-200 ${
+                    facility.hours.currentStatus === 'closed' 
+                      ? 'bg-gray-100 opacity-75' 
+                      : 'bg-white'
+                  }`}
                   onClick={() => router.push(`/facility/${encodeURIComponent(facility.name)}`)}
                 >
                   {/* Occupancy Hero Section */}
                   <div className="p-8 text-center">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">{facility.name}</h3>
                     
+                    {facility.hours.currentStatus === 'closed' && (
+                      <div className="mb-4 py-2 px-4 bg-red-100 text-red-800 rounded-md inline-block font-bold">
+                        CLOSED • {facility.hours.nextChange}
+                      </div>
+                    )}
+                    
                     {/* Large Occupancy Display */}
                     <div className="mb-6">
                       <div 
-                        className="text-6xl font-bold mb-2"
+                        className={`text-6xl font-bold mb-2 ${facility.hours.currentStatus === 'closed' ? 'text-gray-400' : ''}`}
                         style={{ 
-                          color: overallPercentage < 40 ? '#10b981' : 
+                          color: facility.hours.currentStatus === 'closed' ? '#9ca3af' : 
+                                 overallPercentage < 40 ? '#10b981' : 
                                  overallPercentage < 70 ? '#f59e0b' : '#ef4444' 
                         }}
                       >
@@ -209,7 +220,8 @@ export default function HomePage() {
                           className="h-4 rounded-full transition-all duration-500"
                           style={{ 
                             width: `${Math.min(overallPercentage, 100)}%`,
-                            backgroundColor: overallPercentage < 40 ? '#10b981' : 
+                            backgroundColor: facility.hours.currentStatus === 'closed' ? '#d1d5db' : 
+                                           overallPercentage < 40 ? '#10b981' : 
                                            overallPercentage < 70 ? '#f59e0b' : '#ef4444'
                           }}
                         ></div>
@@ -220,13 +232,16 @@ export default function HomePage() {
                         <span 
                           className="px-4 py-2 rounded-full text-sm font-bold"
                           style={{
-                            backgroundColor: overallPercentage < 40 ? '#dcfce7' : 
+                            backgroundColor: facility.hours.currentStatus === 'closed' ? '#f3f4f6' : 
+                                           overallPercentage < 40 ? '#dcfce7' : 
                                            overallPercentage < 70 ? '#fef3c7' : '#fee2e2',
-                            color: overallPercentage < 40 ? '#166534' : 
+                            color: facility.hours.currentStatus === 'closed' ? '#6b7280' : 
+                                   overallPercentage < 40 ? '#166534' : 
                                    overallPercentage < 70 ? '#92400e' : '#991b1b'
                           }}
                         >
-                          {overallPercentage < 40 ? '🟢 LOW CROWDING' : 
+                          {facility.hours.currentStatus === 'closed' ? '⚪ CLOSED' :
+                           overallPercentage < 40 ? '🟢 LOW CROWDING' : 
                            overallPercentage < 70 ? '🟡 MODERATE CROWDING' : '🔴 HIGH CROWDING'}
                         </span>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
