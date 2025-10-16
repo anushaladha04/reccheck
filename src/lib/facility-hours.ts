@@ -237,7 +237,7 @@ export function isFacilityOpen(facilityName: string): { isOpen: boolean; status:
   
   // Check for special hours first
   const todaySpecialHours = checkSpecialHours(hours.specialHours);
-  let todayHours = todaySpecialHours || hours.regularHours[dayOfWeek];
+  const todayHours = todaySpecialHours || hours.regularHours[dayOfWeek];
   
   // Handle CLOSED case
   if (todayHours.toLowerCase().includes('closed')) {
