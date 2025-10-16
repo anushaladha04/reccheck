@@ -1,6 +1,6 @@
 # RecCheck - UCLA Recreation Occupancy Tracker
 
-Live occupancy tracking for UCLA Recreation facilities. See real-time crowding levels, find optimal workout times, and avoid the crowds.
+Live occupancy tracking for UCLA Recreation facilities. See real-time crowding levels, find optimal workout times, and avoid the crowds. Check it out here: https://reccheck-wmns.vercel.app/ 
 
 ## Features
 
