@@ -174,9 +174,11 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Live Occupancy Status</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.map((facility, index) => {
-              const totalOccupancy = facility.zones.reduce((sum, zone) => sum + zone.currentOccupancy, 0);
+              // If facility is closed, set occupancy to 0
+              const isClosed = facility.hours.currentStatus === 'closed';
+              const totalOccupancy = isClosed ? 0 : facility.zones.reduce((sum, zone) => sum + zone.currentOccupancy, 0);
               const totalCapacity = facility.zones.reduce((sum, zone) => sum + zone.maxCapacity, 0);
-              const overallPercentage = totalCapacity > 0 ? Math.round((totalOccupancy / totalCapacity) * 100) : 0;
+              const overallPercentage = isClosed ? 0 : (totalCapacity > 0 ? Math.round((totalOccupancy / totalCapacity) * 100) : 0);
               
               return (
                 <div
@@ -189,8 +191,8 @@ export default function HomePage() {
                   onClick={() => router.push(`/facility/${encodeURIComponent(facility.name)}`)}
                 >
                   {/* Occupancy Hero Section */}
-                  <div className="p-8 text-center">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{facility.name}</h3>
+                  <div className="px-6 py-4 text-center">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{facility.name}</h3>
                     
                     {facility.hours.currentStatus === 'closed' && (
                       <div className="mb-4 py-2 px-4 bg-red-100 text-red-800 rounded-md inline-block font-bold">
@@ -199,9 +201,9 @@ export default function HomePage() {
                     )}
                     
                     {/* Large Occupancy Display */}
-                    <div className="mb-6">
+                    <div className="mb-4">
                       <div 
-                        className={`text-6xl font-bold mb-2 ${facility.hours.currentStatus === 'closed' ? 'text-gray-400' : ''}`}
+                        className={`text-5xl font-bold mb-1 ${facility.hours.currentStatus === 'closed' ? 'text-gray-400' : ''}`}
                         style={{ 
                           color: facility.hours.currentStatus === 'closed' ? '#9ca3af' : 
                                  overallPercentage < 40 ? '#10b981' : 
@@ -256,7 +258,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Zone Breakdown */}
-                  <div className="px-8 pb-8">
+                  <div className="px-6 pb-4">
                     <div className="text-sm font-medium text-gray-600 mb-3">Zone Status:</div>
                     <div className="grid grid-cols-2 gap-2">
                       {facility.zones.slice(0, 4).map((zone, zoneIndex) => (
@@ -265,11 +267,12 @@ export default function HomePage() {
                           <div 
                             className="text-lg font-bold"
                             style={{ 
-                              color: zone.occupancyPercentage < 40 ? '#10b981' : 
+                              color: isClosed ? '#9ca3af' :
+                                     zone.occupancyPercentage < 40 ? '#10b981' : 
                                      zone.occupancyPercentage < 70 ? '#f59e0b' : '#ef4444' 
                             }}
                           >
-                            {zone.occupancyPercentage}%
+                            {isClosed ? '0' : zone.occupancyPercentage}%
                           </div>
                         </div>
                       ))}
