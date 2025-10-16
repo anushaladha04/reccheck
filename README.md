@@ -25,8 +25,6 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000 to view the app.
-
 ## Tech Stack
 
 - Next.js 15 with App Router
