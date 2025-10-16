@@ -123,8 +123,12 @@ function parseTimeString(timeStr: string): { open: Date; close: Date } | null {
   const open = new Date(today.getTime() + openTime * 60 * 60 * 1000 + parseInt(openMin) * 60 * 1000);
   const close = new Date(today.getTime() + closeTime * 60 * 60 * 1000 + parseInt(closeMin) * 60 * 1000);
   
-  // Handle overnight hours (e.g., 6:00 AM - 12:00 AM next day)
-  if (closeTime < openTime) {
+  // Handle overnight hours
+  // For cases like "6:00 AM - 12:00 AM" or "6:00 AM - 1:00 AM" 
+  // where closing time is after midnight but earlier in the day than the opening time
+  if (closeTime < openTime || 
+      (closePeriod === 'AM' && openPeriod === 'AM' && closeTime === openTime) || 
+      (closePeriod === 'AM' && openPeriod === 'PM')) {
     close.setDate(close.getDate() + 1);
   }
   
