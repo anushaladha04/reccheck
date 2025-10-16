@@ -41,32 +41,3 @@ Open http://localhost:3000 to view the app.
 2. Calculates occupancy percentages for each zone
 3. Displays real-time crowding levels with color coding
 4. Updates every 30 seconds to keep data current
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. Fork this repository
-2. Connect to Vercel
-3. Deploy with zero configuration
-
-### Netlify
-
-1. Connect GitHub account to Netlify
-2. Select this repository
-3. Build command: `npm run build`
-4. Publish directory: `.next`
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## License
-
-MIT License - see LICENSE file for details.
-
-Built with ❤️ for the UCLA community.
