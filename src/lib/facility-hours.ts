@@ -1,6 +1,6 @@
 // UCLA Recreation facility hours of operation
 // This data is scraped from the official UCLA Recreation facility pages
-// Fixed hours calculation for overnight hours
+// Fixed hours calculation for overnight hours (properly handles 12:00 AM closing times)
 
 export interface FacilityHours {
   facility: string;
