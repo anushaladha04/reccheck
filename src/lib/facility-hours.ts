@@ -1,5 +1,6 @@
 // UCLA Recreation facility hours of operation
 // This data is scraped from the official UCLA Recreation facility pages
+// Fixed hours calculation for overnight hours
 
 export interface FacilityHours {
   facility: string;
