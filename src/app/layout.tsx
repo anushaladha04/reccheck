@@ -11,6 +11,15 @@ const lato = Lato({
 export const metadata: Metadata = {
   title: "RecCheck - UCLA Recreation Occupancy Tracker",
   description: "Live occupancy tracking for UCLA Recreation facilities",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+    other: {
+      rel: 'apple-touch-icon-precomposed',
+      url: '/favicon.svg',
+    },
+  },
 };
 
 export default function RootLayout({
