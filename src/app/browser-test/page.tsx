@@ -2,8 +2,24 @@
 
 import { useState, useEffect } from 'react';
 
+interface Zone {
+  facility: string;
+  zone: string;
+  currentOccupancy: number;
+  maxCapacity: number;
+  occupancyPercentage: number;
+  lastUpdated: string;
+  status: 'Low' | 'Moderate' | 'High' | 'Closed';
+}
+
+interface Facility {
+  name: string;
+  zones: Zone[];
+  lastUpdated: string;
+}
+
 export default function BrowserTestPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Facility[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -91,7 +107,7 @@ export default function BrowserTestPage() {
 
         {data && (
           <div className="space-y-6">
-            {data.map((facility: any, index: number) => (
+            {data.map((facility, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
                   <h2 className="text-2xl font-bold">{facility.name}</h2>
@@ -102,7 +118,7 @@ export default function BrowserTestPage() {
                 
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {facility.zones.map((zone: any, zoneIndex: number) => (
+                    {facility.zones.map((zone, zoneIndex) => (
                       <div key={zoneIndex} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-3">
                           <h3 className="font-semibold text-gray-900">{zone.zone}</h3>
@@ -146,7 +162,7 @@ export default function BrowserTestPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Total Occupancy:</span>
                       <span className="text-xl font-bold text-blue-600">
-                        {facility.zones.reduce((sum: number, zone: any) => sum + zone.currentOccupancy, 0)} people
+                        {facility.zones.reduce((sum: number, zone) => sum + zone.currentOccupancy, 0)} people
                       </span>
                     </div>
                   </div>

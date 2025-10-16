@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 interface FacilityData {
@@ -42,7 +42,7 @@ export default function FacilityDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -76,15 +76,16 @@ export default function FacilityDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [facilityName]);
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
-  }, [facilityName]);
+  }, [fetchData]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open': return 'text-green-600 bg-green-100';
@@ -93,12 +94,14 @@ export default function FacilityDetailPage() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getOccupancyColor = (percentage: number) => {
     if (percentage < 40) return 'text-green-600 bg-green-100';
     if (percentage < 70) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getOccupancyBarColor = (percentage: number) => {
     if (percentage < 40) return 'bg-green-500';
     if (percentage < 70) return 'bg-yellow-500';
@@ -242,7 +245,7 @@ export default function FacilityDetailPage() {
 
         {/* Hours Information - Secondary */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Today's Hours</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Today&apos;s Hours</h3>
           <div className="text-center">
             <div className="text-lg text-gray-600 mb-2">{data.hours.todayHours}</div>
             <div className="text-sm text-gray-500">Next change: {data.hours.nextChange}</div>

@@ -77,30 +77,35 @@ export function getOccupancyStatus(percentage: number): 'Low' | 'Moderate' | 'Hi
 }
 
 // Utility function to validate occupancy data
-export function validateOccupancyData(data: any): data is OccupancyData {
+export function validateOccupancyData(data: unknown): data is OccupancyData {
+  if (!data || typeof data !== 'object') return false;
+  
+  const d = data as Record<string, unknown>;
   return (
-    data &&
-    typeof data.facility === 'string' &&
-    typeof data.zone === 'string' &&
-    typeof data.currentOccupancy === 'number' &&
-    typeof data.maxCapacity === 'number' &&
-    typeof data.occupancyPercentage === 'number' &&
-    data.currentOccupancy >= 0 &&
-    data.maxCapacity > 0 &&
-    data.occupancyPercentage >= 0 &&
-    data.occupancyPercentage <= 100 &&
-    ['Low', 'Moderate', 'High', 'Closed'].includes(data.status)
+    typeof d.facility === 'string' &&
+    typeof d.zone === 'string' &&
+    typeof d.currentOccupancy === 'number' &&
+    typeof d.maxCapacity === 'number' &&
+    typeof d.occupancyPercentage === 'number' &&
+    (d.currentOccupancy as number) >= 0 &&
+    (d.maxCapacity as number) > 0 &&
+    (d.occupancyPercentage as number) >= 0 &&
+    (d.occupancyPercentage as number) <= 100 &&
+    typeof d.status === 'string' &&
+    ['Low', 'Moderate', 'High', 'Closed'].includes(d.status as string)
   );
 }
 
 // Utility function to validate facility data
-export function validateFacilityData(data: any): data is FacilityData {
+export function validateFacilityData(data: unknown): data is FacilityData {
+  if (!data || typeof data !== 'object') return false;
+  
+  const d = data as Record<string, unknown>;
   return (
-    data &&
-    typeof data.name === 'string' &&
-    Array.isArray(data.zones) &&
-    data.zones.every(validateOccupancyData) &&
-    typeof data.lastUpdated === 'string'
+    typeof d.name === 'string' &&
+    Array.isArray(d.zones) &&
+    d.zones.every(validateOccupancyData) &&
+    typeof d.lastUpdated === 'string'
   );
 }
 
@@ -165,6 +170,7 @@ async function scrapeJWCOccupancyData(): Promise<FacilityData[]> {
         
         // Extract status (Open/Closed)
         const isOpen = text.includes('(Open)') || text.includes('Open');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const status = isOpen ? 'Open' : 'Closed';
         
         // Extract count (look for numbers)
@@ -219,6 +225,7 @@ async function scrapeJWCOccupancyData(): Promise<FacilityData[]> {
         while ((match = occupancyPattern.exec(text)) !== null) {
           const [, zoneName, statusText, count, timestamp, percentage] = match;
           
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const isOpen = statusText.toLowerCase().includes('open');
           const currentOccupancy = parseInt(count);
           const occupancyPercentage = parseInt(percentage);
@@ -332,7 +339,7 @@ export async function fetchHistoricalOccupancyData(
   zone?: string,
   startDate?: Date,
   endDate?: Date
-): Promise<any[]> {
+): Promise<Record<string, unknown>[]> {
   // Use demo historical data only if explicitly enabled
   if (API_CONFIG.useDemoData) {
     console.log('Using demo historical data (explicitly enabled)');
@@ -371,7 +378,7 @@ function generateDemoHistoricalData(
   zone?: string,
   startDate?: Date,
   endDate?: Date
-): any[] {
+): Record<string, unknown>[] {
   const data = [];
   const now = new Date();
   const start = startDate || new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago

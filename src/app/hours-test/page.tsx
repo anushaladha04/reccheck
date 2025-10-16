@@ -2,8 +2,43 @@
 
 import { useState, useEffect } from 'react';
 
+interface RegularHours {
+  monday: string;
+  tuesday: string;
+  wednesday: string;
+  thursday: string;
+  friday: string;
+  saturday: string;
+  sunday: string;
+}
+
+interface Hours {
+  currentStatus: 'open' | 'closed' | 'unknown';
+  todayHours: string;
+  nextChange: string;
+  regularHours: RegularHours;
+  specialHours?: string[];
+}
+
+interface Zone {
+  facility: string;
+  zone: string;
+  currentOccupancy: number;
+  maxCapacity: number;
+  occupancyPercentage: number;
+  lastUpdated: string;
+  status: 'Low' | 'Moderate' | 'High' | 'Closed';
+}
+
+interface Facility {
+  name: string;
+  zones: Zone[];
+  hours: Hours;
+  lastUpdated: string;
+}
+
 export default function HoursTestPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Facility[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -91,7 +126,7 @@ export default function HoursTestPage() {
 
         {data && (
           <div className="space-y-6">
-            {data.map((facility: any, index: number) => (
+            {data.map((facility, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
                 {/* Facility Header with Hours Status */}
                 <div className={`p-6 text-white ${
@@ -124,7 +159,7 @@ export default function HoursTestPage() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">🕒 Hours of Operation</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-medium text-gray-900 mb-2">Today's Hours</h4>
+                        <h4 className="font-medium text-gray-900 mb-2">Today&apos;s Hours</h4>
                         <p className="text-gray-700">{facility.hours.todayHours}</p>
                       </div>
                       <div className="bg-gray-50 p-4 rounded-lg">
@@ -154,7 +189,7 @@ export default function HoursTestPage() {
                       <div className="mt-4 bg-yellow-50 p-4 rounded-lg">
                         <h4 className="font-medium text-yellow-900 mb-2">⚠️ Special Hours</h4>
                         <ul className="text-sm text-yellow-800 space-y-1">
-                          {facility.hours.specialHours.map((special: string, idx: number) => (
+                          {facility.hours.specialHours.map((special, idx) => (
                             <li key={idx}>• {special}</li>
                           ))}
                         </ul>
@@ -166,7 +201,7 @@ export default function HoursTestPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">👥 Current Occupancy</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {facility.zones.map((zone: any, zoneIndex: number) => (
+                      {facility.zones.map((zone, zoneIndex) => (
                         <div key={zoneIndex} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                           <div className="flex justify-between items-start mb-3">
                             <h4 className="font-semibold text-gray-900">{zone.zone}</h4>
@@ -210,7 +245,7 @@ export default function HoursTestPage() {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Total Occupancy:</span>
                         <span className="text-xl font-bold text-blue-600">
-                          {facility.zones.reduce((sum: number, zone: any) => sum + zone.currentOccupancy, 0)} people
+                          {facility.zones.reduce((sum: number, zone) => sum + zone.currentOccupancy, 0)} people
                         </span>
                       </div>
                     </div>

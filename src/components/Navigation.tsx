@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
+  // No unused router variable
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: '🏠' },

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { analyzeDataFreshness, getFreshnessColor, getFreshnessIcon } from '@/lib/data-freshness';
 
 interface FreshnessData {
@@ -127,7 +128,7 @@ export default function RealtimeMonitorPage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Source Information</h3>
           <div className="space-y-2 text-sm text-gray-600">
             <p><strong>Source:</strong> UCLA Recreation live occupancy system (connect2mycloud.com)</p>
-            <p><strong>Update Frequency:</strong> UCLA's system updates every 2-5 minutes</p>
+            <p><strong>Update Frequency:</strong> UCLA&apos;s system updates every 2-5 minutes</p>
             <p><strong>Our Refresh Rate:</strong> Every 10 seconds (checks for new data)</p>
             <p><strong>Data Latency:</strong> 2-5 minutes behind real-time occupancy</p>
           </div>

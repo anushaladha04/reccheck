@@ -3,8 +3,24 @@
 import { useState } from 'react';
 import { fetchLiveOccupancyData } from '@/lib/client-api';
 
+interface Zone {
+  facility: string;
+  zone: string;
+  currentOccupancy: number;
+  maxCapacity: number;
+  occupancyPercentage: number;
+  lastUpdated: string;
+  status: 'Low' | 'Moderate' | 'High' | 'Closed';
+}
+
+interface Facility {
+  name: string;
+  zones: Zone[];
+  lastUpdated: string;
+}
+
 export default function TestScrapingPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Facility[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +93,7 @@ export default function TestScrapingPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-xl font-semibold mb-4">Live Data</h3>
               
-              {data.map((facility: any, index: number) => (
+              {data.map((facility, index) => (
                 <div key={index} className="mb-6">
                   <h4 className="text-lg font-medium text-gray-900 mb-3">{facility.name}</h4>
                   <p className="text-sm text-gray-500 mb-4">
@@ -85,7 +101,7 @@ export default function TestScrapingPage() {
                   </p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {facility.zones.map((zone: any, zoneIndex: number) => (
+                    {facility.zones.map((zone, zoneIndex) => (
                       <div key={zoneIndex} className="border rounded-lg p-4">
                         <h5 className="font-medium text-gray-900 mb-2">{zone.zone}</h5>
                         <div className="space-y-2">

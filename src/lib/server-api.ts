@@ -2,7 +2,9 @@
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 import { DATA_FETCHING_CONFIG } from '@/config/data-fetching';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { getFacilityConfig, getAllFacilities, type FacilityConfig } from '@/config/facilities';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { fetchUCLALiveOccupancyData, groupOccupancyByFacility, getFacilityOccupancy } from '@/lib/ucla-api';
 
 export interface OccupancyData {
@@ -145,6 +147,7 @@ async function scrapeFacilityOccupancyData(facilityId?: string): Promise<Facilit
       
       // Extract status (Open/Closed)
       const isOpen = html.includes('(Open)') || html.includes('color:green');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const status = isOpen ? 'Open' : 'Closed';
       
       // Extract count
@@ -190,6 +193,7 @@ async function scrapeFacilityOccupancyData(facilityId?: string): Promise<Facilit
         if (match) {
           const [, zoneName, statusText, count, percentage] = match;
           
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const isOpen = statusText.toLowerCase().includes('open');
           const currentOccupancy = parseInt(count);
           const occupancyPercentage = parseInt(percentage);

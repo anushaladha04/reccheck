@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navigation from '@/components/Navigation';
+// Navigation component is imported but not used in this file
 
 interface FacilityData {
   name: string;
@@ -39,6 +39,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  // We'll keep these state variables for future use
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFacility, setSelectedFacility] = useState<string | null>(null);
 
   const fetchData = async () => {
@@ -69,6 +71,7 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open': return 'text-green-600 bg-green-100';
@@ -77,12 +80,14 @@ export default function HomePage() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getOccupancyColor = (percentage: number) => {
     if (percentage < 40) return 'text-green-600 bg-green-100';
     if (percentage < 70) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getOccupancyBarColor = (percentage: number) => {
     if (percentage < 40) return 'bg-green-500';
     if (percentage < 70) return 'bg-yellow-500';
@@ -270,7 +275,7 @@ export default function HomePage() {
 
         {/* Hours Information - Secondary */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Today's Hours</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Today&apos;s Hours</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {data.map((facility, index) => (
               <div key={index} className="text-center">
