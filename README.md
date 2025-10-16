@@ -1,40 +1,72 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RecCheck - UCLA Recreation Occupancy Tracker
 
-## Getting Started
+Live occupancy tracking for UCLA Recreation facilities. See real-time crowding levels, find optimal workout times, and avoid the crowds.
 
-First, run the development server:
+## Features
+
+- **Live Occupancy Data** - Real-time data from UCLA Recreation API
+- **Multi-Facility Support** - John Wooden Center, BruinFit, Kinross Recreation Center
+- **Zone Breakdown** - Individual occupancy for Cardio, Free Weights, Selectorized equipment
+- **Color-Coded Status** - Green (Low), Yellow (Moderate), Red (High) crowding
+- **Hours Integration** - Current hours and next schedule changes
+- **Mobile-First Design** - Optimized for phones and tablets
+- **Custom UI** - UCLA-inspired design with Lato font
+
+## Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/anushaladha04/reccheck.git
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 15 with App Router
+- TypeScript
+- Tailwind CSS
+- Lato font
+- UCLA Recreation API
 
-## Learn More
+## How It Works
 
-To learn more about Next.js, take a look at the following resources:
+1. Fetches live occupancy data from UCLA Recreation's official API
+2. Calculates occupancy percentages for each zone
+3. Displays real-time crowding levels with color coding
+4. Updates every 30 seconds to keep data current
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Vercel (Recommended)
 
-## Deploy on Vercel
+1. Fork this repository
+2. Connect to Vercel
+3. Deploy with zero configuration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Netlify
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# reccheck
->>>>>>> 7373d65f9437cf4dd1bf3f9818fd2c6aee6e643f
+1. Connect GitHub account to Netlify
+2. Select this repository
+3. Build command: `npm run build`
+4. Publish directory: `.next`
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## License
+
+MIT License - see LICENSE file for details.
+
+Built with ❤️ for the UCLA community.
