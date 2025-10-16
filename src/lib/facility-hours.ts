@@ -108,7 +108,8 @@ function parseTimeString(timeStr: string): { open: Date; close: Date } | null {
   
   const [, openHour, openMin, openPeriod, closeHour, closeMin, closePeriod] = match;
   
-  const now = new Date();
+  // Force Pacific Time (UCLA's timezone) for consistency between environments
+  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
   // Parse open time
@@ -140,7 +141,8 @@ function parseTimeString(timeStr: string): { open: Date; close: Date } | null {
 function checkSpecialHours(specialHours: string[] | undefined): string | null {
   if (!specialHours || specialHours.length === 0) return null;
   
-  const now = new Date();
+  // Force Pacific Time (UCLA's timezone) for consistency between environments
+  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
   const currentMonth = now.getMonth() + 1; // JavaScript months are 0-indexed
   const currentDate = now.getDate();
   const currentYear = now.getFullYear();
@@ -205,7 +207,8 @@ function getNextDayHours(facilityName: string): string {
   const hours = FACILITY_HOURS[facilityName];
   if (!hours) return 'Unknown';
   
-  const now = new Date();
+  // Force Pacific Time (UCLA's timezone) for consistency between environments
+  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   
@@ -231,7 +234,8 @@ export function isFacilityOpen(facilityName: string): { isOpen: boolean; status:
     return { isOpen: false, status: 'Hours not available', nextChange: 'Unknown' };
   }
   
-  const now = new Date();
+  // Force Pacific Time (UCLA's timezone) for consistency between environments
+  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const dayOfWeek = dayNames[now.getDay()] as keyof typeof hours.regularHours;
   
@@ -306,7 +310,8 @@ export function getFacilityHours(facilityName: string): FacilityHours | null {
   if (!hours) return null;
   
   // Get today's date info
-  const now = new Date();
+  // Force Pacific Time (UCLA's timezone) for consistency between environments
+  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const dayOfWeek = dayNames[now.getDay()] as keyof typeof hours.regularHours;
   
