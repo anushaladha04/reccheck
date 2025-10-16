@@ -136,6 +136,94 @@ function parseTimeString(timeStr: string): { open: Date; close: Date } | null {
   return { open, close };
 }
 
+// Check for special hours that apply today
+function checkSpecialHours(specialHours: string[] | undefined): string | null {
+  if (!specialHours || specialHours.length === 0) return null;
+  
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // JavaScript months are 0-indexed
+  const currentDate = now.getDate();
+  const currentYear = now.getFullYear();
+  
+  // Format: MM/DD
+  const todayShortFormat = `${currentMonth}/${currentDate}`;
+  // Check for full dates like 12/25/2025
+  const todayFullFormat = `${currentMonth}/${currentDate}/${currentYear}`;
+  
+  for (const specialHour of specialHours) {
+    // Skip title entries (no date patterns)
+    if (!specialHour.match(/\d+\/\d+/) && !specialHour.includes('CLOSED')) continue;
+    
+    // Check for exact date matches
+    if (specialHour.includes(todayShortFormat) || specialHour.includes(todayFullFormat)) {
+      // Extract hours for today
+      const hourMatch = specialHour.match(new RegExp(`${todayShortFormat}\s*:\s*([^,]+)`)) || 
+                        specialHour.match(new RegExp(`${todayFullFormat}\s*:\s*([^,]+)`));
+      
+      if (hourMatch && hourMatch[1]) {
+        return hourMatch[1].trim();
+      }
+      
+      // If it just says CLOSED for today
+      if (specialHour.toLowerCase().includes('closed')) {
+        return 'CLOSED';
+      }
+    }
+    
+    // Check for date ranges like 11/27-11/30
+    const rangeMatch = specialHour.match(/(\d+)\/(\d+)-(\d+)\/(\d+)/g);
+    if (rangeMatch) {
+      for (const range of rangeMatch) {
+        const [startMonth, startDay, endMonth, endDay] = range.split(/[\/\-]/).map(Number);
+        
+        const today = new Date(currentYear, currentMonth - 1, currentDate);
+        const startDate = new Date(currentYear, startMonth - 1, startDay);
+        const endDate = new Date(currentYear, endMonth - 1, endDay);
+        
+        // Check if today falls within the range
+        if (today >= startDate && today <= endDate) {
+          // Find specific hours or if it's closed
+          if (specialHour.toLowerCase().includes('closed')) {
+            return 'CLOSED';
+          }
+          
+          // Try to extract specific hours for this date range
+          const hoursMatch = specialHour.match(/[^:]+:\s*([^,]+)/i);
+          if (hoursMatch && hoursMatch[1]) {
+            return hoursMatch[1].trim();
+          }
+        }
+      }
+    }
+  }
+  
+  return null; // No special hours found for today
+}
+
+// Get the next day's hours
+function getNextDayHours(facilityName: string): string {
+  const hours = FACILITY_HOURS[facilityName];
+  if (!hours) return 'Unknown';
+  
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const nextDayOfWeek = dayNames[tomorrow.getDay()] as keyof typeof hours.regularHours;
+  
+  return hours.regularHours[nextDayOfWeek];
+}
+
+// Format time for display
+function formatTimeForDisplay(date: Date): string {
+  return date.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
+}
+
 // Check if facility is currently open
 export function isFacilityOpen(facilityName: string): { isOpen: boolean; status: string; nextChange: string } {
   const hours = FACILITY_HOURS[facilityName];
@@ -146,10 +234,26 @@ export function isFacilityOpen(facilityName: string): { isOpen: boolean; status:
   const now = new Date();
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const dayOfWeek = dayNames[now.getDay()] as keyof typeof hours.regularHours;
-  const todayHours = hours.regularHours[dayOfWeek];
   
+  // Check for special hours first
+  const todaySpecialHours = checkSpecialHours(hours.specialHours);
+  let todayHours = todaySpecialHours || hours.regularHours[dayOfWeek];
+  
+  // Handle CLOSED case
   if (todayHours.toLowerCase().includes('closed')) {
-    return { isOpen: false, status: 'Closed today', nextChange: 'Check tomorrow' };
+    // Get next day's hours for better user info
+    const nextDayHours = getNextDayHours(facilityName);
+    const nextDay = new Date(now);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDayName = dayNames[nextDay.getDay()];
+    
+    return { 
+      isOpen: false, 
+      status: 'Closed today', 
+      nextChange: nextDayHours.toLowerCase().includes('closed') ? 
+        `Closed tomorrow (${nextDayName})` : 
+        `Opens tomorrow (${nextDayName}) at ${nextDayHours.split('-')[0].trim()}`
+    };
   }
   
   const timeRange = parseTimeString(todayHours);
@@ -158,9 +262,36 @@ export function isFacilityOpen(facilityName: string): { isOpen: boolean; status:
   }
   
   const isOpen = now >= timeRange.open && now <= timeRange.close;
-  const nextChange = isOpen ? 
-    `Closes at ${timeRange.close.toLocaleTimeString()}` : 
-    `Opens at ${timeRange.open.toLocaleTimeString()}`;
+  
+  // Calculate time difference for better user experience
+  let nextChange = '';
+  if (isOpen) {
+    const minutesUntilClose = Math.round((timeRange.close.getTime() - now.getTime()) / 60000);
+    if (minutesUntilClose <= 60) {
+      nextChange = `Closes in ${minutesUntilClose} minute${minutesUntilClose !== 1 ? 's' : ''}`;
+    } else {
+      nextChange = `Closes at ${formatTimeForDisplay(timeRange.close)}`;
+    }
+  } else {
+    if (now < timeRange.open) {
+      const minutesUntilOpen = Math.round((timeRange.open.getTime() - now.getTime()) / 60000);
+      if (minutesUntilOpen <= 60) {
+        nextChange = `Opens in ${minutesUntilOpen} minute${minutesUntilOpen !== 1 ? 's' : ''}`;
+      } else {
+        nextChange = `Opens at ${formatTimeForDisplay(timeRange.open)}`;
+      }
+    } else {
+      // After closing time, show next day's hours
+      const nextDayHours = getNextDayHours(facilityName);
+      const nextDay = new Date(now);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const nextDayName = dayNames[nextDay.getDay()];
+      
+      nextChange = nextDayHours.toLowerCase().includes('closed') ? 
+        `Closed tomorrow (${nextDayName})` : 
+        `Opens tomorrow (${nextDayName}) at ${nextDayHours.split('-')[0].trim()}`;
+    }
+  }
   
   return {
     isOpen,
@@ -174,20 +305,47 @@ export function getFacilityHours(facilityName: string): FacilityHours | null {
   const hours = FACILITY_HOURS[facilityName];
   if (!hours) return null;
   
+  // Get today's date info
+  const now = new Date();
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayOfWeek = dayNames[now.getDay()] as keyof typeof hours.regularHours;
+  
+  // Check for special hours
+  const specialHoursToday = checkSpecialHours(hours.specialHours);
+  
+  // Create a copy of the hours object so we don't modify the original data
+  const currentHours = { ...hours };
+  
+  // Update with the most current information
+  if (specialHoursToday) {
+    currentHours.todayHours = specialHoursToday;
+  } else {
+    currentHours.todayHours = hours.regularHours[dayOfWeek];
+  }
+  
   // Update current status
   const openStatus = isFacilityOpen(facilityName);
-  hours.currentStatus = openStatus.isOpen ? 'open' : 'closed';
+  currentHours.currentStatus = openStatus.isOpen ? 'open' : 'closed';
+  currentHours.lastUpdated = new Date().toISOString();
   
-  return hours;
+  return currentHours;
 }
 
 // Get all facility hours
 export function getAllFacilityHours(): FacilityHours[] {
-  return Object.values(FACILITY_HOURS).map(hours => {
-    const openStatus = isFacilityOpen(hours.facility);
-    return {
-      ...hours,
-      currentStatus: openStatus.isOpen ? 'open' : 'closed'
-    };
+  return Object.keys(FACILITY_HOURS).map(facilityName => {
+    // Use the getFacilityHours function to get consistent results
+    const facilityHours = getFacilityHours(facilityName);
+    if (!facilityHours) {
+      // This should never happen since we're iterating over keys in FACILITY_HOURS
+      console.error(`Failed to get hours for ${facilityName}`);
+      return {
+        ...FACILITY_HOURS[facilityName],
+        currentStatus: 'unknown',
+        lastUpdated: new Date().toISOString()
+      };
+    }
+    
+    return facilityHours;
   });
 }
